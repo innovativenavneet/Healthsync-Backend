@@ -1,0 +1,362 @@
+================================================================================
+                    HEALTHSYNC BACKEND API TESTING GUIDE
+================================================================================
+
+🌐 BASE URL: https://healthsync-backend-2qcw.onrender.com
+
+================================================================================
+                                AUTHENTICATION ENDPOINTS
+================================================================================
+
+1. USER SIGNUP
+   Method: POST
+   URL: https://healthsync-backend-2qcw.onrender.com/api/auth/signup
+   Headers: Content-Type: application/json
+   Body:
+   {
+     "name": "Dr. John Smith",
+     "email": "doctor@example.com",
+     "password": "password123",
+     "role": "doctor"
+   }
+   
+   Expected Response (201):
+   {
+     "message": "Signup successful",
+     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   }
+
+2. USER LOGIN
+   Method: POST
+   URL: https://healthsync-backend-2qcw.onrender.com/api/auth/login
+   Headers: Content-Type: application/json
+   Body:
+   {
+     "email": "doctor@example.com",
+     "password": "password123"
+   }
+   
+   Expected Response (200):
+   {
+     "message": "Login successful",
+     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   }
+
+3. GOOGLE LOGIN
+   Method: POST
+   URL: https://healthsync-backend-2qcw.onrender.com/api/auth/googleLogin
+   Headers: Content-Type: application/json
+   Body:
+   {
+     "token": "google_id_token_here"
+   }
+
+================================================================================
+                                PATIENT MANAGEMENT ENDPOINTS
+================================================================================
+
+⚠️  NOTE: All patient endpoints require Authorization header with Bearer token
+
+4. CREATE PATIENT
+   Method: POST
+   URL: https://healthsync-backend-2qcw.onrender.com/api/patients
+   Headers: 
+     Content-Type: application/json
+     Authorization: Bearer YOUR_JWT_TOKEN
+   Body:
+   {
+     "name": "John Doe",
+     "email": "john.doe@example.com",
+     "phone": "+1234567890",
+     "dateOfBirth": "1990-01-01",
+     "gender": "male",
+     "address": {
+       "street": "123 Main St",
+       "city": "New York",
+       "state": "NY",
+       "zipCode": "10001",
+       "country": "USA"
+     },
+     "emergencyContact": {
+       "name": "Jane Doe",
+       "phone": "+1234567891",
+       "relationship": "Spouse"
+     }
+   }
+
+5. GET ALL PATIENTS
+   Method: GET
+   URL: https://healthsync-backend-2qcw.onrender.com/api/patients
+   Headers: Authorization: Bearer YOUR_JWT_TOKEN
+   
+   Expected Response (200):
+   {
+     "success": true,
+     "patients": [
+       {
+         "_id": "patient_id",
+         "name": "John Doe",
+         "email": "john.doe@example.com",
+         "phone": "+1234567890",
+         "gender": "male",
+         "assignedDoctor": "doctor_id",
+         "status": "active",
+         "createdAt": "2024-01-27T10:30:00.000Z"
+       }
+     ]
+   }
+
+6. GET SPECIFIC PATIENT
+   Method: GET
+   URL: https://healthsync-backend-2qcw.onrender.com/api/patients/PATIENT_ID
+   Headers: Authorization: Bearer YOUR_JWT_TOKEN
+
+7. UPDATE PATIENT
+   Method: PUT
+   URL: https://healthsync-backend-2qcw.onrender.com/api/patients/PATIENT_ID
+   Headers: 
+     Content-Type: application/json
+     Authorization: Bearer YOUR_JWT_TOKEN
+   Body:
+   {
+     "name": "John Doe Updated",
+     "phone": "+1234567899"
+   }
+
+8. ADD MEDICAL HISTORY
+   Method: POST
+   URL: https://healthsync-backend-2qcw.onrender.com/api/patients/PATIENT_ID/medical-history
+   Headers: 
+     Content-Type: application/json
+     Authorization: Bearer YOUR_JWT_TOKEN
+   Body:
+   {
+     "condition": "Hypertension",
+     "diagnosis": "High blood pressure",
+     "treatment": "Lisinopril 10mg daily",
+     "date": "2024-01-27T10:30:00.000Z"
+   }
+
+================================================================================
+                                EMAIL ENDPOINTS
+================================================================================
+
+9. GET PATIENTS FOR EMAIL
+   Method: GET
+   URL: https://healthsync-backend-2qcw.onrender.com/api/mail/patients
+   Headers: Authorization: Bearer YOUR_JWT_TOKEN
+   
+   Expected Response (200):
+   {
+     "success": true,
+     "patients": [
+       {
+         "_id": "patient_id",
+         "name": "John Doe",
+         "email": "john.doe@example.com"
+       }
+     ]
+   }
+
+10. SEND EMAIL TO PATIENT
+    Method: POST
+    URL: https://healthsync-backend-2qcw.onrender.com/api/mail
+    Headers: 
+      Content-Type: application/json
+      Authorization: Bearer YOUR_JWT_TOKEN
+    Body:
+    {
+      "patientId": "PATIENT_ID",
+      "subject": "Appointment Reminder",
+      "message": "Dear John, this is a reminder for your appointment tomorrow."
+    }
+
+================================================================================
+                                TRANSCRIPTION ENDPOINTS
+================================================================================
+
+11. GET ALL TRANSCRIPTIONS
+    Method: GET
+    URL: https://healthsync-backend-2qcw.onrender.com/api/transcribe
+    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    
+    Expected Response (200):
+    {
+      "success": true,
+      "transcriptions": [
+        {
+          "_id": "transcription_id",
+          "patientId": "patient_id",
+          "audioFile": "audio_file_url",
+          "transcription": "Patient reported symptoms...",
+          "status": "completed",
+          "createdAt": "2024-01-27T10:30:00.000Z"
+        }
+      ]
+    }
+
+12. TRANSCRIBE AUDIO FILE
+    Method: POST
+    URL: https://healthsync-backend-2qcw.onrender.com/api/transcribe
+    Headers: 
+      Authorization: Bearer YOUR_JWT_TOKEN
+      Content-Type: multipart/form-data
+    Body: FormData with audio file
+
+================================================================================
+                                HEALTH CHECK ENDPOINT
+================================================================================
+
+13. HEALTH CHECK
+    Method: GET
+    URL: https://healthsync-backend-2qcw.onrender.com/health
+    
+    Expected Response (200):
+    {
+      "status": "OK",
+      "message": "HealthSync Backend is running"
+    }
+
+================================================================================
+                                TESTING WORKFLOW
+================================================================================
+
+STEP 1: Test Health Check
+curl -X GET https://healthsync-backend-2qcw.onrender.com/health
+
+STEP 2: Create a Doctor Account
+curl -X POST https://healthsync-backend-2qcw.onrender.com/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Dr. Test Doctor",
+    "email": "testdoctor@example.com",
+    "password": "testpassword123",
+    "role": "doctor"
+  }'
+
+STEP 3: Login to Get Token
+curl -X POST https://healthsync-backend-2qcw.onrender.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testdoctor@example.com",
+    "password": "testpassword123"
+  }'
+
+STEP 4: Create a Patient (using token from step 3)
+curl -X POST https://healthsync-backend-2qcw.onrender.com/api/patients \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "phone": "+1234567890",
+    "gender": "male"
+  }'
+
+STEP 5: Get All Patients
+curl -X GET https://healthsync-backend-2qcw.onrender.com/api/patients \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+
+================================================================================
+                                JAVASCRIPT/FETCH EXAMPLES
+================================================================================
+
+// Health Check
+fetch('https://healthsync-backend-2qcw.onrender.com/health')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Login
+const loginData = {
+  email: 'doctor@example.com',
+  password: 'password123'
+};
+
+fetch('https://healthsync-backend-2qcw.onrender.com/api/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(loginData)
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Token:', data.token);
+  localStorage.setItem('token', data.token);
+});
+
+// Create Patient
+const token = localStorage.getItem('token');
+const patientData = {
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  phone: '+1234567890',
+  gender: 'male'
+};
+
+fetch('https://healthsync-backend-2qcw.onrender.com/api/patients', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  body: JSON.stringify(patientData)
+})
+.then(response => response.json())
+.then(data => console.log(data));
+
+// Get All Patients
+fetch('https://healthsync-backend-2qcw.onrender.com/api/patients', {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data.patients));
+
+================================================================================
+                                ERROR CODES & MEANINGS
+================================================================================
+
+200 - Success
+201 - Created (for signup/patient creation)
+400 - Bad Request (missing required fields)
+401 - Unauthorized (invalid/missing token)
+403 - Forbidden (wrong role, e.g., patient trying to access doctor features)
+404 - Not Found (patient/transcription not found)
+500 - Internal Server Error (server/database issue)
+
+================================================================================
+                                IMPORTANT NOTES
+================================================================================
+
+1. ALWAYS include Authorization header with Bearer token for protected endpoints
+2. All timestamps are in ISO 8601 format
+3. Patient IDs and Doctor IDs are MongoDB ObjectIds
+4. Email addresses must be unique for patients
+5. Only doctors can create/manage patients
+6. Audio files for transcription should be in supported formats (WAV, MP3, etc.)
+7. The server is deployed on Render and may have cold start delays
+
+================================================================================
+                                TROUBLESHOOTING
+================================================================================
+
+❌ 502 Bad Gateway: Server is starting up, wait 30 seconds and try again
+❌ 401 Unauthorized: Check if token is valid and included in Authorization header
+❌ 403 Forbidden: Make sure user has 'doctor' role for patient management
+❌ 500 Internal Server Error: Check request body format and required fields
+❌ CORS Error: Make sure your frontend domain is whitelisted
+
+================================================================================
+                                SUPPORT
+================================================================================
+
+If you encounter issues:
+1. Check the health endpoint first
+2. Verify your request format matches the examples
+3. Ensure all required fields are provided
+4. Check that your token is valid and not expired
+5. Test with a simple endpoint before complex operations
+
+Happy Testing! 🚀 
