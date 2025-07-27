@@ -7,6 +7,6 @@ router.post('/signup',signup);
 
 router.post('/login',login);
 
-router.post('/gooleLogin',googleLogin);
+router.post('/googleLogin',googleLogin);
 
 module.exports= router;
