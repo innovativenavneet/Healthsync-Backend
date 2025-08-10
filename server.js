@@ -3,25 +3,19 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config({ path: './config/.env' });
 
-// MongoDB Connection with better error handling
 const connectDB = async () => {
   try {
     if (!process.env.MONGO_URI) {
       console.error('❌ MONGO_URI environment variable is not set');
-      console.log('💡 Please set your MongoDB connection string in config/.env');
       process.exit(1);
     }
-    
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ Connected to MongoDB');
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
-    console.log('💡 Please check your MONGO_URI in config/.env');
-    console.log('💡 Make sure your MongoDB Atlas cluster is running');
     process.exit(1);
   }
 };
-
+// calling mongodb funtion 
 connectDB();
 
 const patientRoutes = require('./routes/patientRoutes');
@@ -33,7 +27,7 @@ const app = express();
 // CORS configuration for production
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.com'] 
+    ? ['https://healthsync-backend-2qcw.onrender.com'] 
     : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true
 }));

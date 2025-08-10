@@ -19,6 +19,7 @@ const transcribeAudio = async (req, res) => {
 
     // Read the audio file
     const audioBytes = fs.readFileSync(filePath);
+    // converting file into base64 if from front if it coming in base64 then dont need to convert 
     const audio = { content: audioBytes.toString('base64') };
 
     // Detect audio format based on file extension
