@@ -58,6 +58,16 @@ const createPatient = async (req, res) => {
       return res.status(400).json({ error: 'Patient with this email already exists' });
     }
 
+    try {
+      const indexes = await Patient.collection.indexes();
+      if (indexes.some(index => index.name === 'firebaseUid_1')) {
+        await Patient.collection.dropIndex('firebaseUid_1');
+        console.log('Removed obsolete MongoDB index: firebaseUid_1');
+      }
+    } catch (error) {
+      if (error.code !== 26) throw error;
+    }
+
     const patient = new Patient({
       name,
       email,
