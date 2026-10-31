@@ -4,7 +4,7 @@ const { transcribeAudio, getTranscriptions, getTranscriptionById } = require('..
 const { requireAuth } = require('../middleware/authMiddleware');
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 
 // All routes require authentication
 router.use(requireAuth);

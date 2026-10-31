@@ -1,4 +1,3 @@
-const fs = require('fs');
 const client = require('../config/cloudConfig');
 const Transcription = require('../models/transcriptionModel');
 
@@ -14,11 +13,7 @@ const transcribeAudio = async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const filePath = req.file.path;
-    console.log('Audio file received at:', filePath);
-
-    // Read the audio file
-    const audioBytes = fs.readFileSync(filePath);
+    const audioBytes = req.file.buffer;
     // converting file into base64 if from front if it coming in base64 then dont need to convert 
     const audio = { content: audioBytes.toString('base64') };
 
@@ -84,8 +79,6 @@ const transcribeAudio = async (req, res) => {
 
     await transcriptionDoc.save();
 
-    // Clean up the uploaded file
-    fs.unlinkSync(filePath);  
     console.log('Transcription saved to database successfully');
 
     res.json({ 
@@ -97,15 +90,6 @@ const transcribeAudio = async (req, res) => {
   } catch (error) {
     console.error('Transcription error:', error);
     
-    // Clean up file even if transcription fails
-    if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (cleanupError) {
-        console.error('Failed to cleanup file:', cleanupError);
-      }
-    }
-
     // Provide more specific error messages
     if (error.code === 16) {
       return res.status(401).json({ 
